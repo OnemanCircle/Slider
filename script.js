@@ -57,3 +57,21 @@ function changeImage(dir) {
 
 // Initialize
 updateImages();
+let startX = 0;
+
+document.addEventListener("touchstart", (e) => {
+  startX = e.touches[0].clientX;
+});
+
+document.addEventListener("touchend", (e) => {
+  const endX = e.changedTouches[0].clientX;
+  const diff = startX - endX;
+
+  if (Math.abs(diff) > 50) {
+    if (diff > 0) {
+      changeImage(1); // Swipe left
+    } else {
+      changeImage(-1); // Swipe right
+    }
+  }
+});
