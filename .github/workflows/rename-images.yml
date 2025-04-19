@@ -13,14 +13,20 @@ jobs:
 
       - name: Rename .jpg files in /images
         run: |
+          # Navigate to the images folder
           cd images
+          
+          # Initialize counter for renaming
           i=1
+          
+          # Loop through all jpg files and rename them sequentially
           for file in *.jpg; do
             new_name="${i}.jpg"
+            # Only rename if the file name is different
             if [ "$file" != "$new_name" ]; then
               mv "$file" "$new_name"
             fi
-            i=$((i + 1))
+            i=$((i + 1))  # Increment counter
           done
 
       - name: Commit and push changes
