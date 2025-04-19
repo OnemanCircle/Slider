@@ -11,13 +11,28 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Get the highest numbered .jpg file
+        id: get_last_number
+        run: |
+          # Find the highest numbered .jpg file
+          highest=$(ls images/*.jpg | sed 's/[^0-9]*[0-9]*\.jpg/\1/' | sort -n | tail -n 1)
+          echo "Last image number: $highest"
+          echo "::set-output name=last_number::$highest"
+
       - name: Rename .jpg files in /images
         run: |
-          # Navigate to the images folder
-          cd images
+          # Get the last image number from the previous step
+          last_number=${{ steps.get_last_number.outputs.last_number }}
+          # Set the starting point for renaming
+          if [ -z "$last_number" ]; then
+            last_number=0  # If no images exist yet, start from 0
+          fi
           
           # Initialize counter for renaming
-          i=1
+          i=$((last_number + 1))
+
+          # Navigate to the images folder
+          cd images
           
           # Loop through all jpg files and rename them sequentially
           for file in *.jpg; do
