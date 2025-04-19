@@ -1,39 +1,59 @@
-let currentSlide = 0;
-const slider = document.getElementById("slider");
+let currentIndex = 1;
+let totalImages = 0;
+const mainContainer = document.getElementById("mainImageContainer");
+const nextContainer = document.getElementById("nextImageContainer");
+const background = document.getElementById("background");
 
-// Dynamically load images from /images/1.jpg, 2.jpg, ...
-async function loadImages() {
-  let index = 1;
-  while (true) {
-    const img = new Image();
-    img.src = `images/${index}.jpg`;
-    img.classList.add("slide-image");
+async function imageExists(src) {
+  const img = new Image();
+  img.src = src;
+  return await new Promise((res) => {
+    img.onload = () => res(true);
+    img.onerror = () => res(false);
+  });
+}
 
-    const loaded = await new Promise((resolve) => {
-      img.onload = () => resolve(true);
-      img.onerror = () => resolve(false);
-    });
-
-    if (!loaded) break;
-
-    slider.appendChild(img);
-    index++;
+async function preloadNext(index) {
+  const nextImg = `images/${index}.jpg`;
+  if (await imageExists(nextImg)) {
+    totalImages = Math.max(totalImages, index);
+    return nextImg;
   }
+  return null;
+}
 
-  if (slider.children.length > 0) {
-    showSlide(0);
+async function updateImages() {
+  const mainImg = document.createElement("img");
+  const mainSrc = `images/${currentIndex}.jpg`;
+  mainImg.src = mainSrc;
+
+  const nextSrc = await preloadNext(currentIndex + 1);
+
+  mainContainer.innerHTML = "";
+  mainContainer.appendChild(mainImg);
+
+  // Animate background
+  background.style.backgroundImage = `url(${mainSrc})`;
+
+  // Update next preview
+  nextContainer.innerHTML = "";
+  if (nextSrc) {
+    const nextImg = document.createElement("img");
+    nextImg.src = nextSrc;
+    nextContainer.appendChild(nextImg);
   }
 }
 
-function showSlide(index) {
-  const totalSlides = slider.children.length;
-  if (totalSlides === 0) return;
-  currentSlide = (index + totalSlides) % totalSlides;
-  slider.style.transform = `translateX(-${currentSlide * 100}%)`;
+function changeImage(dir) {
+  const newIndex = currentIndex + dir;
+  if (newIndex < 1) return;
+  preloadNext(newIndex).then((exists) => {
+    if (exists) {
+      currentIndex = newIndex;
+      updateImages();
+    }
+  });
 }
 
-function moveSlide(dir) {
-  showSlide(currentSlide + dir);
-}
-
-loadImages();
+// Initialize
+updateImages();
