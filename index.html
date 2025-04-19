@@ -2,22 +2,16 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Infinite Image Slider</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>High-Res Infinite Slider</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <div class="slider-container">
-    <div class="background-blur" id="background"></div>
-    <div class="image-slider" id="slider">
-      <!-- Images will be dynamically inserted here -->
-    </div>
-    <div class="nav-buttons">
-      <button id="prevBtn">←</button>
-      <button id="nextBtn">→</button>
-    </div>
+    <div class="slider" id="slider"></div>
+    <button class="button prev-button" onclick="moveSlide(-1)">&#10094;</button>
+    <button class="button next-button" onclick="moveSlide(1)">&#10095;</button>
   </div>
-
   <script src="script.js"></script>
 </body>
 </html>
