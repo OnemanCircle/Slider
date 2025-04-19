@@ -1,55 +1,39 @@
-const imageSources = [
-  'images/1.jpg',
-  'images/2.jpg',
-  'images/3.jpg',
-  'images/4.jpg',
-  'images/5.jpg',
-  // Add as many as you like here
-];
+let currentSlide = 0;
+const slider = document.getElementById("slider");
 
-let currentIndex = 0;
+// Dynamically load images from /images/1.jpg, 2.jpg, ...
+async function loadImages() {
+  let index = 1;
+  while (true) {
+    const img = new Image();
+    img.src = `images/${index}.jpg`;
+    img.classList.add("slide-image");
 
-const slider = document.getElementById('slider');
-const background = document.getElementById('background');
-const prevBtn = document.getElementById('prevBtn');
-const nextBtn = document.getElementById('nextBtn');
+    const loaded = await new Promise((resolve) => {
+      img.onload = () => resolve(true);
+      img.onerror = () => resolve(false);
+    });
 
-function updateSlider() {
-  // Clear current slides
-  slider.innerHTML = '';
+    if (!loaded) break;
 
-  // Current image
-  const mainImage = document.createElement('img');
-  mainImage.src = imageSources[currentIndex];
-  mainImage.classList.add('image-slide');
-  slider.appendChild(mainImage);
-
-  // Next image preview (optional, only if exists)
-  const nextIndex = (currentIndex + 1) % imageSources.length;
-  if (imageSources[nextIndex]) {
-    const previewImage = document.createElement('img');
-    previewImage.src = imageSources[nextIndex];
-    previewImage.classList.add('image-slide', 'preview');
-    slider.appendChild(previewImage);
+    slider.appendChild(img);
+    index++;
   }
 
-  // Update blurred background
-  background.style.backgroundImage = `url('${imageSources[currentIndex]}')`;
+  if (slider.children.length > 0) {
+    showSlide(0);
+  }
 }
 
-function prevImage() {
-  currentIndex = (currentIndex - 1 + imageSources.length) % imageSources.length;
-  updateSlider();
+function showSlide(index) {
+  const totalSlides = slider.children.length;
+  if (totalSlides === 0) return;
+  currentSlide = (index + totalSlides) % totalSlides;
+  slider.style.transform = `translateX(-${currentSlide * 100}%)`;
 }
 
-function nextImage() {
-  currentIndex = (currentIndex + 1) % imageSources.length;
-  updateSlider();
+function moveSlide(dir) {
+  showSlide(currentSlide + dir);
 }
 
-// Button events
-prevBtn.addEventListener('click', prevImage);
-nextBtn.addEventListener('click', nextImage);
-
-// Initial load
-updateSlider();
+loadImages();
